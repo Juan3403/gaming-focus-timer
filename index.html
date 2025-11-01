@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timer de Foco para Gaming</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .status {
+            text-align: center;
+            padding: 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .status.active {
+            background: #d4edda;
+            border: 2px solid #28a745;
+        }
+        
+        .status-text {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .timer-display {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .start-btn {
+            background: #28a745;
+            color: white;
+        }
+        
+        .start-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+        
+        .stop-btn {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .stop-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+        
+        .settings {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .setting-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+        
+        .value-display {
+            text-align: right;
+            color: #667eea;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 2px solid #ddd;
+            font-size: 16px;
+        }
+        
+        .instructions {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .instructions h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .instructions ul {
+            margin-left: 20px;
+            color: #555;
+        }
+        
+        .instructions li {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Timer de Foco para Gaming</h1>
+        <p class="subtitle">Sons periódicos para lembrar de ampliar sua visão</p>
+        
+        <div class="status" id="status">
+            <div class="status-text">Timer Pausado</div>
+            <div class="timer-display" id="timerDisplay">00:00</div>
+        </div>
+        
+        <div class="controls">
+            <button class="start-btn" id="startBtn" onclick="startTimer()">▶ Iniciar</button>
+            <button class="stop-btn" id="stopBtn" onclick="stopTimer()">⏹ Parar</button>
+        </div>
+        
+        <div class="settings">
+            <div class="setting-group">
+                <label>Intervalo entre Sons: <span class="value-display" id="intervalValue">8 segundos</span></label>
+                <input type="range" id="intervalSlider" min="3" max="15" value="8" step="1" onchange="updateInterval()">
+            </div>
+            
+            <div class="setting-group">
+                <label>Volume: <span class="value-display" id="volumeValue">70%</span></label>
+                <input type="range" id="volumeSlider" min="0" max="100" value="70" step="5" onchange="updateVolume()">
+            </div>
+            
+            <div class="setting-group">
+                <label>Tipo de Som:</label>
+                <select id="soundType" onchange="updateSoundType()">
+                    <option value="beep">Bip Suave</option>
+                    <option value="bell">Sino</option>
+                    <option value="click">Click</option>
+                    <option value="chime">Chime</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>💡 Como usar:</h3>
+            <ul>
+                <li>Inicie o timer ANTES de começar a jogar</li>
+                <li>Cada som = lembrete para fazer varredura visual da tela</li>
+                <li>Ajuste o intervalo conforme sua preferência (recomendo 8-10s)</li>
+                <li>Mantenha em uma aba separada enquanto joga</li>
+                <li>Com o tempo, seu cérebro vai associar o som com "ampliar visão"</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let interval;
+        let isRunning = false;
+        let seconds = 0;
+        let intervalTime = 8;
+        let volume = 0.7;
+        let soundType = 'beep';
+        let audioContext;
+        
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+        
+        function playSound() {
+            initAudio();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            let frequency, duration;
+            
+            switch(soundType) {
+                case 'beep':
+                    frequency = 800;
+                    duration = 0.1;
+                    break;
+                case 'bell':
+                    frequency = 1200;
+                    duration = 0.3;
+                    break;
+                case 'click':
+                    frequency = 1500;
+                    duration = 0.05;
+                    break;
+                case 'chime':
+                    frequency = 1000;
+                    duration = 0.2;
+                    break;
+            }
+            
+            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration);
+        }
+        
+        function startTimer() {
+            if (isRunning) return;
+            
+            initAudio();
+            isRunning = true;
+            document.getElementById('status').classList.add('active');
+            document.getElementById('status').querySelector('.status-text').textContent = '🎯 Timer Ativo';
+            
+            interval = setInterval(() => {
+                seconds++;
+                updateDisplay();
+                
+                if (seconds % intervalTime === 0) {
+                    playSound();
+                }
+            }, 1000);
+        }
+        
+        function stopTimer() {
+            isRunning = false;
+            clearInterval(interval);
+            seconds = 0;
+            updateDisplay();
+            document.getElementById('status').classList.remove('active');
+            document.getElementById('status').querySelector('.status-text').textContent = 'Timer Pausado';
+        }
+        
+        function updateDisplay() {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            document.getElementById('timerDisplay').textContent = 
+                `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+        
+        function updateInterval() {
+            intervalTime = parseInt(document.getElementById('intervalSlider').value);
+            document.getElementById('intervalValue').textContent = `${intervalTime} segundos`;
+        }
+        
+        function updateVolume() {
+            const volumePercent = parseInt(document.getElementById('volumeSlider').value);
+            volume = volumePercent / 100;
+            document.getElementById('volumeValue').textContent = `${volumePercent}%`;
+        }
+        
+        function updateSoundType() {
+            soundType = document.getElementById('soundType').value;
+        }
+    </script>
+</body>
+</html>
